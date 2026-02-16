@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Pump Maintenance Analytics Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f6fa 0%, #e9ecef 100%);
+            color: #2c3e50;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+        }
+
+        .metric-card.danger {
+            border-left-color: #e74c3c;
+        }
+
+        .metric-card.success {
+            border-left-color: #2ecc71;
+        }
+
+        .metric-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .metric-card.danger .metric-value {
+            color: #e74c3c;
+        }
+
+        .metric-card.success .metric-value {
+            color: #2ecc71;
+        }
+
+        .metric-card.warning .metric-value {
+            color: #f39c12;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .pump-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pump-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+            transition: all 0.2s;
+        }
+
+        .pump-item:hover {
+            background: #ecf0f1;
+            transform: translateX(5px);
+        }
+
+        .pump-rank {
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-right: 12px;
+            min-width: 30px;
+            font-size: 16px;
+        }
+
+        .pump-info {
+            flex: 1;
+        }
+
+        .pump-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .pump-status {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .pump-rate {
+            font-size: 16px;
+            font-weight: bold;
+            color: #3498db;
+            text-align: right;
+        }
+
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .finding-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #e74c3c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .finding-card.info {
+            border-left-color: #3498db;
+        }
+
+        .finding-card.success {
+            border-left-color: #2ecc71;
+        }
+
+        .finding-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .finding-card h3 {
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #e74c3c;
+        }
+
+        .finding-card.info h3 {
+            color: #3498db;
+        }
+
+        .finding-card.success h3 {
+            color: #2ecc71;
+        }
+
+        .finding-card.warning h3 {
+            color: #f39c12;
+        }
+
+        .finding-card p {
+            font-size: 13px;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #ecf0f1;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .significance-no {
+            padding: 4px 8px;
+            background: #ffe0e0;
+            color: #c0392b;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .significance-yes {
+            padding: 4px 8px;
+            background: #e0ffe0;
+            color: #27ae60;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 13px;
+            border-top: 1px solid #ecf0f1;
+            margin-top: 30px;
+        }
+
+        .note {
+            background: #ffe0e0;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #c0392b;
+        }
+
+        .note.info {
+            background: #d6eaf8;
+            color: #2980b9;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: #ecf0f1;
+            margin: 40px 0 30px 0;
+        }
+
+        .key-insight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 5px solid #f39c12;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Industrial Pump Fleet Analytics Dashboard</h1>
+            <p>Comprehensive Maintenance Performance & Predictive Analysis - 20,000 Records</p>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Records</div>
+                <div class="metric-value">20,000</div>
+            </div>
+            <div class="metric-card danger">
+                <div class="metric-label">Maintenance Rate</div>
+                <div class="metric-value">49.84%</div>
+            </div>
+            <div class="metric-card success">
+                <div class="metric-label">Fleet Variation</div>
+                <div class="metric-value">&lt;2%</div>
+            </div>
+            <div class="metric-card warning">
+                <div class="metric-label">Avg Op. Hours</div>
+                <div class="metric-value">5,030</div>
+            </div>
+        </div>
+
+        <!-- Distribution Overview -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <h2 class="card-title">Fleet Distribution Overview</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3 style="margin-bottom: 10px; color: #2c3e50;">Overall Maintenance Split</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0;">🔵 No Maintenance: <strong>50.16%</strong> (10,032 records)</li>
+                        <li style="padding: 8px 0;">🔴 Maintenance: <strong>49.84%</strong> (9,968 records)</li>
+                    </ul>
+                    <div class="note info">
+                        Perfect 50/50 balance suggests synthetic data
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 10px; color: #2c3e50;">Pump ID Distribution</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0;">Pump 1: <strong>50.24%</strong> (20.2% of fleet)</li>
+                        <li style="padding: 8px 0;">Pump 2: <strong>49.87%</strong> (20.0% of fleet)</li>
+                        <li style="padding: 8px 0;">Pump 3: <strong>49.91%</strong> (20.0% of fleet)</li>
+                        <li style="padding: 8px 0;">Pump 4: <strong>50.57%</strong> (20.3% of fleet)</li>
+                        <li style="padding: 8px 0;">Pump 5: <strong>48.61%</strong> (19.5% of fleet)</li>
+                    </ul>
+                    <div class="note info">
+                        <2% variation = homogeneous fleet operation
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Pump Rankings -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Pump Performance Ranking</h2>
+                </div>
+                <div class="pump-list">
+                    <div class="pump-item" style="border-left-color: #2ecc71;">
+                        <div class="pump-rank">1</div>
+                        <div class="pump-info">
+                            <div class="pump-name">Pump 5</div>
+                            <div class="pump-status">Best Performer</div>
+                        </div>
+                        <div class="pump-rate" style="color: #2ecc71;">48.61%</div>
+                    </div>
+                    <div class="pump-item" style="border-left-color: #95a5a6;">
+                        <div class="pump-rank">2</div>
+                        <div class="pump-info">
+                            <div class="pump-name">Pump 2</div>
+                            <div class="pump-status">Good</div>
+                        </div>
+                        <div class="pump-rate" style="color: #95a5a6;">49.87%</div>
+                    </div>
+                    <div class="pump-item" style="border-left-color: #f39c12;">
+                        <div class="pump-rank">3</div>
+                        <div class="pump-info">
+                            <div class="pump-name">Pump 3</div>
+                            <div class="pump-status">Good</div>
+                        </div>
+                        <div class="pump-rate" style="color: #f39c12;">49.91%</div>
+                    </div>
+                    <div class="pump-item" style="border-left-color: #e74c3c;">
+                        <div class="pump-rank">4</div>
+                        <div class="pump-info">
+                            <div class="pump-name">Pump 1</div>
+                            <div class="pump-status">Fair</div>
+                        </div>
+                        <div class="pump-rate" style="color: #e74c3c;">50.24%</div>
+                    </div>
+                    <div class="pump-item" style="border-left-color: #c0392b;">
+                        <div class="pump-rank">5</div>
+                        <div class="pump-info">
+                            <div class="pump-name">Pump 4</div>
+                            <div class="pump-status">Needs Attention</div>
+                        </div>
+                        <div class="pump-rate" style="color: #c0392b;">50.57%</div>
+                    </div>
+                </div>
+                <div class="note info">
+                    Fleet Variation: &lt;2% | All pumps operate under similar conditions
+                </div>
+            </div>
+
+            <!-- Lifecycle Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Lifecycle Analysis</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="lifecycleChart"></canvas>
+                </div>
+                <div class="note">
+                    ⚠️ No degradation pattern observed. Flat line at 49-51% across all lifecycle stages.
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistical Analysis Section -->
+        <div class="section-divider"></div>
+        
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <h2 class="card-title">Statistical Significance Testing</h2>
+            </div>
+            <div class="key-insight">
+                ⚠️ CRITICAL FINDING: All p-values > 0.05 and correlations < 0.015 indicate features are statistically independent of maintenance decisions
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Correlation</th>
+                        <th>P-Value</th>
+                        <th>Cohen's d</th>
+                        <th>Significant?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Temperature</strong></td>
+                        <td>-0.0131</td>
+                        <td>0.0649</td>
+                        <td>-0.0261</td>
+                        <td><span class="significance-no">NO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vibration</strong></td>
+                        <td>+0.0076</td>
+                        <td>0.2841</td>
+                        <td>+0.0151</td>
+                        <td><span class="significance-no">NO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pressure</strong></td>
+                        <td>-0.0052</td>
+                        <td>0.4653</td>
+                        <td>-0.0103</td>
+                        <td><span class="significance-no">NO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flow Rate</strong></td>
+                        <td>+0.0087</td>
+                        <td>0.2200</td>
+                        <td>+0.0173</td>
+                        <td><span class="significance-no">NO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>RPM</strong></td>
+                        <td>-0.0086</td>
+                        <td>0.2258</td>
+                        <td>-0.0171</td>
+                        <td><span class="significance-no">NO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operational Hours</strong></td>
+                        <td>-0.0031</td>
+                        <td>0.6613</td>
+                        <td>-0.0062</td>
+                        <td><span class="significance-no">NO</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note">
+                Effect Sizes (Cohen's d): All < 0.03 = negligible practical significance
+            </div>
+        </div>
+
+        <!-- Risk Score Section -->
+        <div class="section-divider"></div>
+
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <h2 class="card-title">Risk Score Analysis</h2>
+            </div>
+            <div class="key-insight">
+                ⚠️ CRITICAL FINDING: All risk categories maintain ~50% maintenance rate (zero discriminative power)
+            </div>
+            <div class="charts-grid">
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">Maintenance Rate by Risk Category</h3>
+                    <table style="width: 100%; margin-bottom: 20px;">
+                        <tbody>
+                            <tr>
+                                <td><strong>Low Risk (0.17-0.73)</strong></td>
+                                <td style="text-align: right;"><strong>49.80%</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Medium Risk (0.73-0.87)</strong></td>
+                                <td style="text-align: right;"><strong>50.00%</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>High Risk (0.87-1.01)</strong></td>
+                                <td style="text-align: right;"><strong>49.36%</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Critical Risk (1.01-1.55)</strong></td>
+                                <td style="text-align: right;"><strong>50.20%</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="note">
+                        Expected: Low 20%, Critical 80% | Actual: All ~50%
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">Risk Score Statistics</h3>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><strong>Minimum</strong></td>
+                                <td style="text-align: right;">0.17</td>
+                            </tr>
+                            <tr>
+                                <td><strong>25th Percentile</strong></td>
+                                <td style="text-align: right;">0.73</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mean</strong></td>
+                                <td style="text-align: right;">0.87</td>
+                            </tr>
+                            <tr>
+                                <td><strong>75th Percentile</strong></td>
+                                <td style="text-align: right;">1.01</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Maximum</strong></td>
+                                <td style="text-align: right;">1.55</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ML Models Section -->
+        <div class="section-divider"></div>
+
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <h2 class="card-title">Machine Learning Model Performance</h2>
+            </div>
+            <div class="key-insight">
+                ⚠️ CRITICAL FINDING: All three algorithms perform at ~50% baseline (random guessing level)
+            </div>
+            <div class="charts-grid">
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">Performance Metrics</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Accuracy</th>
+                                <th>ROC-AUC</th>
+                                <th>F1-Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Logistic Regression</strong></td>
+                                <td>49.53%</td>
+                                <td>0.5016</td>
+                                <td>0.4674</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Random Forest</strong></td>
+                                <td>48.75%</td>
+                                <td>0.4868</td>
+                                <td>0.4631</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gradient Boosting</strong></td>
+                                <td>49.00%</td>
+                                <td>0.4857</td>
+                                <td>0.4676</td>
+                            </tr>
+                            <tr style="background: #ffe0e0; font-weight: bold;">
+                                <td>Random Baseline</td>
+                                <td>50.00%</td>
+                                <td>0.5000</td>
+                                <td>0.5000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">Cross-Validation Scores</h3>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><strong>Logistic Regression</strong></td>
+                                <td style="text-align: right;">0.5089 ± 0.0055</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Random Forest</strong></td>
+                                <td style="text-align: right;">0.5003 ± 0.0126</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gradient Boosting</strong></td>
+                                <td style="text-align: right;">0.5050 ± 0.0029</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="note" style="margin-top: 20px;">
+                        Three different algorithms all fail at baseline = data problem not model problem
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container" style="margin-top: 20px;">
+                <canvas id="modelChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Key Findings -->
+        <div class="section-divider"></div>
+
+        <div style="margin-bottom: 30px;">
+            <h2 style="margin-bottom: 20px; font-size: 24px; color: #2c3e50;">Key Findings Summary</h2>
+            <div class="findings-grid">
+                <div class="finding-card">
+                    <h3>🎯 Critical Discovery</h3>
+                    <p>Maintenance decisions are COMPLETELY INDEPENDENT of sensor readings. All sensors show negligible correlations (|r|<0.015) with maintenance.</p>
+                </div>
+                <div class="finding-card info">
+                    <h3>📊 Fleet Status</h3>
+                    <p>Homogeneous fleet operation with <2% variation across 5 pumps. All pumps maintain similar maintenance rates (48.6%-50.6%).</p>
+                </div>
+                <div class="finding-card warning">
+                    <h3>📈 Lifecycle Pattern</h3>
+                    <p>No degradation observed with operational hours. Contradicts typical industrial wear patterns - expected bathtub curve not observed.</p>
+                </div>
+                <div class="finding-card info">
+                    <h3>🤖 Model Performance</h3>
+                    <p>All ML algorithms (Linear, Tree-based, Boosted) perform at ~50% baseline. This proves the problem is data quality, not model selection.</p>
+                </div>
+                <div class="finding-card danger">
+                    <h3>⚠️ Risk Scoring</h3>
+                    <p>Risk score has ZERO discriminative power. All risk categories show ~50% maintenance rate despite proper statistical distribution.</p>
+                </div>
+                <div class="finding-card">
+                    <h3>🔍 Data Nature</h3>
+                    <p>Likely synthetic data (most probable), externally scheduled maintenance, or failure-driven with unpredictable catastrophic events.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="section-divider"></div>
+
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <h2 class="card-title">Recommendations & Next Steps</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <h3 style="color: #3498db; margin-bottom: 10px;">1. Data Validation</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 4px 0;">✓ Verify if data is synthetic or real</li>
+                        <li style="padding: 4px 0;">✓ Confirm maintenance decision logic</li>
+                        <li style="padding: 4px 0;">✓ Identify external factors (budget, schedule)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #2ecc71; margin-bottom: 10px;">2. Alternative Approaches</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 4px 0;">✓ Anomaly detection (Isolation Forest)</li>
+                        <li style="padding: 4px 0;">✓ Time-series modeling (LSTM, ARIMA)</li>
+                        <li style="padding: 4px 0;">✓ Failure prediction (Survival Analysis)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #f39c12; margin-bottom: 10px;">3. Enhanced Data Collection</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 4px 0;">✓ Bearing temperature (separate)</li>
+                        <li style="padding: 4px 0;">✓ Vibration frequency spectrum (FFT)</li>
+                        <li style="padding: 4px 0;">✓ Oil analysis metrics</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #e74c3c; margin-bottom: 10px;">4. Fleet Optimization</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 4px 0;">✓ Monitor Pump 4 (highest maintenance)</li>
+                        <li style="padding: 4px 0;">✓ Benchmark Pump 5 (best performer)</li>
+                        <li style="padding: 4px 0;">✓ TCO analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Summary -->
+        <div class="card" style="margin-bottom: 30px; background: #f0f8ff; border-left: 5px solid #3498db;">
+            <h3 style="color: #2980b9; margin-bottom: 15px;">Analysis Methodology Summary</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <strong style="color: #2c3e50;">Statistical Approach:</strong>
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li>Pearson correlation analysis</li>
+                        <li>Independent t-tests</li>
+                        <li>Effect size calculations (Cohen's d)</li>
+                        <li>P-value significance testing</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong style="color: #2c3e50;">Machine Learning Approach:</strong>
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li>Logistic Regression</li>
+                        <li>Random Forest Classifier</li>
+                        <li>Gradient Boosting</li>
+                        <li>5-Fold Cross-Validation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Industrial Pump Maintenance Analysis Dashboard</strong></p>
+            <p>Data-Driven Insights for Fleet Optimization | 20,000 Records | 5 Pumps | 6 Operational Features</p>
+            <p style="margin-top: 10px; font-size: 11px;">Analysis Date: February 2026 | Dashboard Version 2.0 (Complete)</p>
+        </div>
+    </div>
+
+    <script>
+        // Lifecycle Chart
+        const lifecycleCtx = document.getElementById('lifecycleChart').getContext('2d');
+        new Chart(lifecycleCtx, {
+            type: 'line',
+            data: {
+                labels: ['Early (<2.5k)', 'Growth (2.5-5k)', 'Mature (5-7.5k)', 'Late (>7.5k)'],
+                datasets: [{
+                    label: 'Maintenance Rate (%)',
+                    data: [50.55, 49.28, 49.18, 50.37],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#3498db',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 48,
+                        max: 52,
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+
+        // Model Performance Chart
+        const modelCtx = document.getElementById('modelChart').getContext('2d');
+        new Chart(modelCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Logistic Regression', 'Random Forest', 'Gradient Boosting'],
+                datasets: [
+                    {
+                        label: 'Accuracy (%)',
+                        data: [49.53, 48.75, 49.00],
+                        backgroundColor: '#3498db'
+                    },
+                    {
+                        label: 'ROC-AUC (%)',
+                        data: [50.16, 48.68, 48.57],
+                        backgroundColor: '#e74c3c'
+                    },
+                    {
+                        label: 'F1-Score (%)',
+                        data: [46.74, 46.31, 46.76],
+                        backgroundColor: '#f39c12'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 40,
+                        max: 55,
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
