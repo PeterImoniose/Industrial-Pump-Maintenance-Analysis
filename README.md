@@ -6,11 +6,14 @@ hours across multiple pumps) can predict whether maintenance is required.
 
 ## What's in this repo
 
-- [`large_industrial_pump_analysis.ipynb`](large_industrial%20pump%20analysis.ipynb) - the full
-  analysis, from data exploration through statistical testing to model comparison.
+- [`industrial_pump_analysis.ipynb`](industrial_pump_analysis.ipynb) - the full analysis, from
+  data exploration through statistical testing to model comparison, organised in numbered sections.
 - [`Industrial_Pump_Dashboard.html`](Industrial_Pump_Dashboard.html) - a standalone, self-contained
   Chart.js dashboard summarising the dataset (open it directly in a browser, no server needed).
-- [`Industrial Pump .pptx`](Industrial%20Pump%20.pptx) - a slide summary of the findings.
+- [`industrial_pump_findings.pptx`](industrial_pump_findings.pptx) - a slide summary of the findings.
+
+The dataset (`Large_Industrial_Pump_Maintenance_Dataset.csv`) is not included;
+place it in a `data/` folder next to the notebook to re-run it.
 
 ## Methodology
 
