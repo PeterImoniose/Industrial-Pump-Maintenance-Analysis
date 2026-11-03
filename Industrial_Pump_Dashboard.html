@@ -355,8 +355,8 @@
                 <div>
                     <h3 style="margin-bottom: 10px; color: #2c3e50;">Overall Maintenance Split</h3>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="padding: 8px 0;">🔵 No Maintenance: <strong>50.16%</strong> (10,032 records)</li>
-                        <li style="padding: 8px 0;">🔴 Maintenance: <strong>49.84%</strong> (9,968 records)</li>
+                        <li style="padding: 8px 0;">No Maintenance: <strong>50.16%</strong> (10,032 records)</li>
+                        <li style="padding: 8px 0;">Maintenance: <strong>49.84%</strong> (9,968 records)</li>
                     </ul>
                     <div class="note info">
                         Perfect 50/50 balance suggests synthetic data
@@ -441,7 +441,7 @@
                     <canvas id="lifecycleChart"></canvas>
                 </div>
                 <div class="note">
-                    ⚠️ No degradation pattern observed. Flat line at 49-51% across all lifecycle stages.
+                    No degradation pattern observed. Flat line at 49-51% across all lifecycle stages.
                 </div>
             </div>
         </div>
@@ -454,7 +454,7 @@
                 <h2 class="card-title">Statistical Significance Testing</h2>
             </div>
             <div class="key-insight">
-                ⚠️ CRITICAL FINDING: All p-values > 0.05 and correlations < 0.015 indicate features are statistically independent of maintenance decisions
+                Critical finding: All p-values > 0.05 and correlations < 0.015 indicate features are statistically independent of maintenance decisions
             </div>
             <table>
                 <thead>
@@ -524,7 +524,7 @@
                 <h2 class="card-title">Risk Score Analysis</h2>
             </div>
             <div class="key-insight">
-                ⚠️ CRITICAL FINDING: All risk categories maintain ~50% maintenance rate (zero discriminative power)
+                Critical finding: All risk categories maintain ~50% maintenance rate (zero discriminative power)
             </div>
             <div class="charts-grid">
                 <div>
@@ -591,7 +591,7 @@
                 <h2 class="card-title">Machine Learning Model Performance</h2>
             </div>
             <div class="key-insight">
-                ⚠️ CRITICAL FINDING: All three algorithms perform at ~50% baseline (random guessing level)
+                Critical finding: All three algorithms perform at ~50% baseline (random guessing level)
             </div>
             <div class="charts-grid">
                 <div>
@@ -668,27 +668,27 @@
             <h2 style="margin-bottom: 20px; font-size: 24px; color: #2c3e50;">Key Findings Summary</h2>
             <div class="findings-grid">
                 <div class="finding-card">
-                    <h3>🎯 Critical Discovery</h3>
+                    <h3>Critical Discovery</h3>
                     <p>Maintenance decisions are COMPLETELY INDEPENDENT of sensor readings. All sensors show negligible correlations (|r|<0.015) with maintenance.</p>
                 </div>
                 <div class="finding-card info">
-                    <h3>📊 Fleet Status</h3>
+                    <h3>Fleet Status</h3>
                     <p>Homogeneous fleet operation with <2% variation across 5 pumps. All pumps maintain similar maintenance rates (48.6%-50.6%).</p>
                 </div>
                 <div class="finding-card warning">
-                    <h3>📈 Lifecycle Pattern</h3>
+                    <h3>Lifecycle Pattern</h3>
                     <p>No degradation observed with operational hours. Contradicts typical industrial wear patterns - expected bathtub curve not observed.</p>
                 </div>
                 <div class="finding-card info">
-                    <h3>🤖 Model Performance</h3>
+                    <h3>Model Performance</h3>
                     <p>All ML algorithms (Linear, Tree-based, Boosted) perform at ~50% baseline. This proves the problem is data quality, not model selection.</p>
                 </div>
                 <div class="finding-card danger">
-                    <h3>⚠️ Risk Scoring</h3>
+                    <h3>Risk Scoring</h3>
                     <p>Risk score has ZERO discriminative power. All risk categories show ~50% maintenance rate despite proper statistical distribution.</p>
                 </div>
                 <div class="finding-card">
-                    <h3>🔍 Data Nature</h3>
+                    <h3>Data Nature</h3>
                     <p>Likely synthetic data (most probable), externally scheduled maintenance, or failure-driven with unpredictable catastrophic events.</p>
                 </div>
             </div>
@@ -705,33 +705,33 @@
                 <div>
                     <h3 style="color: #3498db; margin-bottom: 10px;">1. Data Validation</h3>
                     <ul style="list-style: none; padding-left: 0;">
-                        <li style="padding: 4px 0;">✓ Verify if data is synthetic or real</li>
-                        <li style="padding: 4px 0;">✓ Confirm maintenance decision logic</li>
-                        <li style="padding: 4px 0;">✓ Identify external factors (budget, schedule)</li>
+                        <li style="padding: 4px 0;">Verify if data is synthetic or real</li>
+                        <li style="padding: 4px 0;">Confirm maintenance decision logic</li>
+                        <li style="padding: 4px 0;">Identify external factors (budget, schedule)</li>
                     </ul>
                 </div>
                 <div>
                     <h3 style="color: #2ecc71; margin-bottom: 10px;">2. Alternative Approaches</h3>
                     <ul style="list-style: none; padding-left: 0;">
-                        <li style="padding: 4px 0;">✓ Anomaly detection (Isolation Forest)</li>
-                        <li style="padding: 4px 0;">✓ Time-series modeling (LSTM, ARIMA)</li>
-                        <li style="padding: 4px 0;">✓ Failure prediction (Survival Analysis)</li>
+                        <li style="padding: 4px 0;">Anomaly detection (Isolation Forest)</li>
+                        <li style="padding: 4px 0;">Time-series modeling (LSTM, ARIMA)</li>
+                        <li style="padding: 4px 0;">Failure prediction (Survival Analysis)</li>
                     </ul>
                 </div>
                 <div>
                     <h3 style="color: #f39c12; margin-bottom: 10px;">3. Enhanced Data Collection</h3>
                     <ul style="list-style: none; padding-left: 0;">
-                        <li style="padding: 4px 0;">✓ Bearing temperature (separate)</li>
-                        <li style="padding: 4px 0;">✓ Vibration frequency spectrum (FFT)</li>
-                        <li style="padding: 4px 0;">✓ Oil analysis metrics</li>
+                        <li style="padding: 4px 0;">Bearing temperature (separate)</li>
+                        <li style="padding: 4px 0;">Vibration frequency spectrum (FFT)</li>
+                        <li style="padding: 4px 0;">Oil analysis metrics</li>
                     </ul>
                 </div>
                 <div>
                     <h3 style="color: #e74c3c; margin-bottom: 10px;">4. Fleet Optimization</h3>
                     <ul style="list-style: none; padding-left: 0;">
-                        <li style="padding: 4px 0;">✓ Monitor Pump 4 (highest maintenance)</li>
-                        <li style="padding: 4px 0;">✓ Benchmark Pump 5 (best performer)</li>
-                        <li style="padding: 4px 0;">✓ TCO analysis</li>
+                        <li style="padding: 4px 0;">Monitor Pump 4 (highest maintenance)</li>
+                        <li style="padding: 4px 0;">Benchmark Pump 5 (best performer)</li>
+                        <li style="padding: 4px 0;">TCO analysis</li>
                     </ul>
                 </div>
             </div>
